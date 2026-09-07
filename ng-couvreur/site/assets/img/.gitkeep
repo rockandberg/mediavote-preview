@@ -1,0 +1,3 @@
+# Destination des visuels une fois exportés depuis Higgsfield.
+# Nommage attendu : <num>-<nom>.jpg (ex. 01-hero-couvreur-toiture.jpg)
+# Puis IMAGES_LOCAL = True dans build/build.py et relancer le build.
