@@ -468,6 +468,14 @@ def head(title, meta, path, og_img="01", schema=""):
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&display=swap">%(pre)s%(heropre)s
   <link rel="stylesheet" href="%(css)s">
+  <script>/* Repli image : doit s'attacher avant tout chargement, donc en ligne. */
+  document.addEventListener("error",function(e){var i=e.target;
+  if(!(i instanceof HTMLImageElement)||i.getAttribute("data-repli"))return;
+  i.setAttribute("data-repli","1");var p=i.parentNode;
+  if(p&&p.tagName==="PICTURE"){var s=p.querySelectorAll("source");
+  for(var n=0;n<s.length;n++)s[n].parentNode.removeChild(s[n]);}
+  var u=i.getAttribute("src");i.removeAttribute("srcset");i.removeAttribute("sizes");
+  if(u)i.setAttribute("src",u);},true);</script>
 %(schema)s</head>
 <body class="has-dock">
 <a class="skip" href="#contenu">Aller au contenu</a>

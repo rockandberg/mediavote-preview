@@ -26,6 +26,14 @@
   <link rel="preload" as="image" type="image/avif" fetchpriority="high"
         imagesrcset="/mediavote-preview/ng-couvreur/site/assets/img/28-contact-cta-640.avif 640w, /mediavote-preview/ng-couvreur/site/assets/img/28-contact-cta-960.avif 960w, /mediavote-preview/ng-couvreur/site/assets/img/28-contact-cta-1280.avif 1280w, /mediavote-preview/ng-couvreur/site/assets/img/28-contact-cta-1920.avif 1920w, /mediavote-preview/ng-couvreur/site/assets/img/28-contact-cta-2560.avif 2560w" imagesizes="100vw">
   <link rel="stylesheet" href="/mediavote-preview/ng-couvreur/site/assets/css/site.css">
+  <script>/* Repli image : doit s'attacher avant tout chargement, donc en ligne. */
+  document.addEventListener("error",function(e){var i=e.target;
+  if(!(i instanceof HTMLImageElement)||i.getAttribute("data-repli"))return;
+  i.setAttribute("data-repli","1");var p=i.parentNode;
+  if(p&&p.tagName==="PICTURE"){var s=p.querySelectorAll("source");
+  for(var n=0;n<s.length;n++)s[n].parentNode.removeChild(s[n]);}
+  var u=i.getAttribute("src");i.removeAttribute("srcset");i.removeAttribute("sizes");
+  if(u)i.setAttribute("src",u);},true);</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"ContactPage","url":"https://www.ngcouvreur.fr/contact/","mainEntity":{"@type":"RoofingContractor","name":"NG Couvreur","telephone":"+33744817945","address":{"@type":"PostalAddress","addressLocality":"Propriano","postalCode":"20110","addressRegion":"Corse-du-Sud","addressCountry":"FR"}}}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://www.ngcouvreur.fr/"},{"@type":"ListItem","position":2,"name":"Contact","item":"https://www.ngcouvreur.fr/"}]}</script>
 </head>

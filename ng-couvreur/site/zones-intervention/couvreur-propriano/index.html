@@ -26,6 +26,14 @@
   <link rel="preload" as="image" type="image/avif" fetchpriority="high"
         imagesrcset="/mediavote-preview/ng-couvreur/site/assets/img/26-contexte-propriano-640.avif 640w, /mediavote-preview/ng-couvreur/site/assets/img/26-contexte-propriano-960.avif 960w, /mediavote-preview/ng-couvreur/site/assets/img/26-contexte-propriano-1280.avif 1280w, /mediavote-preview/ng-couvreur/site/assets/img/26-contexte-propriano-1920.avif 1920w, /mediavote-preview/ng-couvreur/site/assets/img/26-contexte-propriano-2560.avif 2560w" imagesizes="100vw">
   <link rel="stylesheet" href="/mediavote-preview/ng-couvreur/site/assets/css/site.css">
+  <script>/* Repli image : doit s'attacher avant tout chargement, donc en ligne. */
+  document.addEventListener("error",function(e){var i=e.target;
+  if(!(i instanceof HTMLImageElement)||i.getAttribute("data-repli"))return;
+  i.setAttribute("data-repli","1");var p=i.parentNode;
+  if(p&&p.tagName==="PICTURE"){var s=p.querySelectorAll("source");
+  for(var n=0;n<s.length;n++)s[n].parentNode.removeChild(s[n]);}
+  var u=i.getAttribute("src");i.removeAttribute("srcset");i.removeAttribute("sizes");
+  if(u)i.setAttribute("src",u);},true);</script>
   <script type="application/ld+json">{
   "@context":"https://schema.org","@type":"RoofingContractor","@id":"https://www.ngcouvreur.fr/#entreprise",
   "name":"NG Couvreur","url":"https://www.ngcouvreur.fr/","telephone":"+33744817945","image":"https://www.ngcouvreur.fr/assets/img/01-hero-couvreur-toiture-1280.jpg",

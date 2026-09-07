@@ -34,6 +34,25 @@
     });
   }
 
+  /* --- Rattrapage des images déjà en erreur ------------------------------ */
+  /* L'écouteur principal est en ligne dans le <head>, car ce script est
+     différé et arrive après le chargement du hero. Ici on ne fait que
+     rattraper celles qui auraient échoué sans déclencher le repli. */
+  [].forEach.call(document.images, function (img) {
+    if (img.complete && img.naturalWidth === 0 && !img.getAttribute('data-repli')) {
+      img.setAttribute('data-repli', '1');
+      var pic = img.parentNode;
+      if (pic && pic.tagName === 'PICTURE') {
+        var sources = pic.querySelectorAll('source');
+        for (var i = 0; i < sources.length; i++) sources[i].parentNode.removeChild(sources[i]);
+      }
+      var jpg = img.getAttribute('src');
+      img.removeAttribute('srcset');
+      img.removeAttribute('sizes');
+      if (jpg) { img.setAttribute('src', jpg + (jpg.indexOf('?') < 0 ? '?r=1' : '&r=1')); }
+    }
+  });
+
   /* --- Apparition au scroll --------------------------------------------- */
   var targets = document.querySelectorAll('.reveal');
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

@@ -26,6 +26,14 @@
   <link rel="preload" as="image" type="image/avif" fetchpriority="high"
         imagesrcset="/mediavote-preview/ng-couvreur/site/assets/img/14-reparation-inspection-480.avif 480w, /mediavote-preview/ng-couvreur/site/assets/img/14-reparation-inspection-720.avif 720w, /mediavote-preview/ng-couvreur/site/assets/img/14-reparation-inspection-960.avif 960w, /mediavote-preview/ng-couvreur/site/assets/img/14-reparation-inspection-1440.avif 1440w, /mediavote-preview/ng-couvreur/site/assets/img/14-reparation-inspection-1920.avif 1920w" imagesizes="100vw">
   <link rel="stylesheet" href="/mediavote-preview/ng-couvreur/site/assets/css/site.css">
+  <script>/* Repli image : doit s'attacher avant tout chargement, donc en ligne. */
+  document.addEventListener("error",function(e){var i=e.target;
+  if(!(i instanceof HTMLImageElement)||i.getAttribute("data-repli"))return;
+  i.setAttribute("data-repli","1");var p=i.parentNode;
+  if(p&&p.tagName==="PICTURE"){var s=p.querySelectorAll("source");
+  for(var n=0;n<s.length;n++)s[n].parentNode.removeChild(s[n]);}
+  var u=i.getAttribute("src");i.removeAttribute("srcset");i.removeAttribute("sizes");
+  if(u)i.setAttribute("src",u);},true);</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Réparation & fuite","serviceType":"Réparation & fuite","url":"https://www.ngcouvreur.fr/services/reparation-fuite/","provider":{"@type":"RoofingContractor","name":"NG Couvreur","telephone":"+33744817945"},"areaServed":[{"@type":"City","name":"Propriano"},{"@type":"City","name":"Sartène"},{"@type":"City","name":"Olmeto"},{"@type":"City","name":"Viggianello"},{"@type":"City","name":"Serra-di-Ferro"},{"@type":"City","name":"Porto-Pollo"}]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://www.ngcouvreur.fr/"},{"@type":"ListItem","position":2,"name":"Services","item":"https://www.ngcouvreur.fr/services/"},{"@type":"ListItem","position":3,"name":"Réparation & fuite","item":"https://www.ngcouvreur.fr/"}]}</script>
 </head>
