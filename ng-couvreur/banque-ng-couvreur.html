@@ -1,0 +1,302 @@
+<title>Banque visuelle NG Couvreur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+--ground:#EFEAE1; --surface:#FAF7F2; --surface-2:#E6DFD3;
+--ink:#221E19; --ink-2:#4A4239; --muted:#7A6F62;
+--line:#D5CCBE; --line-soft:#E2DACD;
+--terre:#A8492A; --zinc:#58626B;
+--display:"Newsreader",Georgia,"Times New Roman",serif;
+--body:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+--mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+--ground:#14120F; --surface:#1C1915; --surface-2:#262119;
+--ink:#EBE5DA; --ink-2:#C3BAAB; --muted:#8E8375;
+--line:#332D25; --line-soft:#282219;
+--terre:#D2724A; --zinc:#8E99A3;}}
+:root[data-theme="dark"]{--ground:#14120F;--surface:#1C1915;--surface-2:#262119;--ink:#EBE5DA;--ink-2:#C3BAAB;--muted:#8E8375;--line:#332D25;--line-soft:#282219;--terre:#D2724A;--zinc:#8E99A3;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+a{color:inherit}
+.masthead{border-bottom:1px solid var(--line);padding:56px 0 28px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--terre);margin:0 0 14px}
+h1{font-family:var(--display);font-weight:500;font-size:clamp(34px,5.4vw,52px);line-height:1.06;letter-spacing:-.015em;margin:0 0 16px;text-wrap:balance}
+.standfirst{font-size:17px;line-height:1.62;color:var(--ink-2);max-width:60ch;margin:0}
+.facts{display:flex;flex-wrap:wrap;gap:0;margin-top:28px;border-top:1px solid var(--line-soft)}
+.fact{padding:14px 26px 14px 0;margin-right:26px;border-right:1px solid var(--line-soft)}
+.fact:last-child{border-right:0}
+.fact dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+.fact dd{margin:0;font-family:var(--mono);font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+section{padding:44px 0 8px}
+.sec-head{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 20px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+h2{font-family:var(--display);font-weight:500;font-size:26px;letter-spacing:-.01em;margin:0 0 4px}
+.bible{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:0 34px}
+.bible div{padding:13px 0;border-bottom:1px solid var(--line-soft)}
+.bible dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--terre);margin-bottom:3px}
+.bible dd{margin:0;font-size:14px;color:var(--ink-2);line-height:1.5}
+.cat{margin-top:38px}
+.cat-bar{display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;
+padding-bottom:11px;border-bottom:2px solid var(--ink)}
+.cat-note{font-size:13.5px;color:var(--muted);max-width:46ch}
+ol.shots{list-style:none;margin:0;padding:0}
+li.shot{display:grid;grid-template-columns:56px 1fr auto;gap:0 20px;align-items:start;
+padding:18px 0;border-bottom:1px solid var(--line-soft)}
+.num{font-family:var(--mono);font-size:19px;color:var(--terre);font-variant-numeric:tabular-nums;padding-top:1px}
+.slug{font-family:var(--mono);font-size:13px;color:var(--ink);margin:0 0 3px;word-break:break-word}
+.use{font-family:var(--display);font-size:18px;line-height:1.3;margin:0 0 5px;text-wrap:balance}
+.desc{margin:0 0 8px;font-size:14px;color:var(--ink-2);max-width:62ch}
+.tech{font-family:var(--mono);font-size:11.5px;color:var(--muted);letter-spacing:.02em;display:flex;flex-wrap:wrap;gap:0 14px}
+.tech span::after{content:"";}
+.pair{color:var(--terre)}
+.open{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;
+text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:2px;
+padding:7px 13px;white-space:nowrap;background:var(--surface);transition:border-color .15s,color .15s}
+.open:hover{border-color:var(--terre);color:var(--terre)}
+.open:focus-visible{outline:2px solid var(--terre);outline-offset:2px}
+.note{background:var(--surface);border-left:2px solid var(--zinc);padding:16px 20px;margin:26px 0 0;font-size:14px;color:var(--ink-2);max-width:70ch}
+.note strong{color:var(--ink);font-weight:600}
+footer{margin-top:56px;padding:26px 0 60px;border-top:1px solid var(--line);
+font-family:var(--mono);font-size:11.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 26px}
+@media(max-width:620px){li.shot{grid-template-columns:44px 1fr;gap:0 14px}
+li.shot .open{grid-column:2;justify-self:start;margin-top:10px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<div class="wrap"><header class="masthead">
+<p class="eyebrow">NG Couvreur · Propriano, Corse-du-Sud</p>
+<h1>Banque visuelle</h1>
+<p class="standfirst">Vingt-huit photographies produites comme un unique reportage : un photographe aurait suivi NG Couvreur pendant plusieurs journées de chantier dans le golfe du Valinco. Même lumière, même personnage, mêmes matériaux, même traitement d'un bout à l'autre de la série.</p>
+<dl class="facts">
+<div class="fact"><dt>Visuels</dt><dd>28</dd></div>
+<div class="fact"><dt>Modèle</dt><dd>nano_banana_pro</dd></div>
+<div class="fact"><dt>Résolution</dt><dd>2K</dd></div>
+<div class="fact"><dt>Température</dt><dd>5400 K</dd></div>
+<div class="fact"><dt>Personnage</dt><dd>1 récurrent</dd></div>
+<div class="fact"><dt>Paires avant/après</dt><dd>2</dd></div>
+</dl></header>
+<section><p class="sec-head">Bible visuelle — paramètres imposés à chaque prompt</p><dl class="bible">
+<div><dt>Lumière</dt><dd>Soleil méditerranéen naturel, 9–11 h ou 16–18 h, latéral à 3/4 arrière. Aucun flash.</dd></div>
+<div><dt>Température</dt><dd>5200–5600 K. Chaude mais neutre — jamais orangée.</dd></div>
+<div><dt>Contraste</dt><dd>Courbe douce, noirs relevés, saturation naturelle à légèrement réduite.</dd></div>
+<div><dt>Focales</dt><dd>24–35 mm architecture · 35–50 mm situation · 85 mm portrait · 90–100 mm macro.</dd></div>
+<div><dt>Architecture</dt><dd>Vernaculaire corse : volumes compacts, enduit à la chaux, pierre granitique, volets bois.</dd></div>
+<div><dt>Matériaux</dt><dd>Tuile canal terre cuite vieillie, zinc naturel patiné, mortier de chaux, granite.</dd></div>
+<div><dt>Environnement</dt><dd>Maquis, oliviers, cyprès, murets de pierre sèche, reliefs du golfe du Valinco.</dd></div>
+<div><dt>Artisan</dt><dd>Homme corse, 42 ans, barbe poivre et sel. Jamais de sourire caméra, jamais de pose.</dd></div>
+<div><dt>Tenue</dt><dd>Pantalon anthracite renforts genoux, chemise bleu ardoise délavé. Aucun logo, aucun texte.</dd></div>
+<div><dt>Sécurité</dt><dd>Harnais mousquetonné, échafaudage avec garde-corps, échelle de toit à crochets.</dd></div>
+<div><dt>Météo</dt><dd>Ciel clair à voilé. Aucun ciel dramatique, aucun HDR, aucune saturation.</dd></div>
+<div><dt>Interdits</dt><dd>Maison américaine ou nordique, bardeaux, brique rouge, PVC blanc, tuile orange vif.</dd></div>
+</dl>
+<p class="note"><strong>Cohérence du personnage.</strong> L'ancre <span style="font-family:var(--mono)">00A</span> fixe le visage, la carrure et la tenue du couvreur ; son identifiant est ensuite passé en référence sur les quatorze visuels où il est reconnaissable. Les deux paires avant/après sont générées en injectant l'image AVANT comme référence, afin que la maison, le cadrage et la lumière restent rigoureusement identiques d'un volet à l'autre.</p>
+</section>
+<section><p class="sec-head">Shot list — 28 visuels</p>
+<div class="cat"><div class="cat-bar"><h2>Ancres</h2><p class="cat-note">Références d&#x27;identité du personnage récurrent</p></div><ol class="shots">
+<li class="shot"><div class="num">00A</div><div>
+<p class="slug">ancre-couvreur-A</p>
+<p class="use">Ancre d&#x27;identité de la série</p>
+<p class="desc">Portrait environnemental fixant le visage, la carrure et la tenue du couvreur. Passé en référence sur 14 visuels.</p>
+<p class="tech"><span>3:2</span><span>85 mm · f/2.0</span><span class="pair">référence d&#x27;identité</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_115724_73f3462c-dcf3-4ae0-82d1-f0e368ac3292.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">00B</div><div>
+<p class="slug">ancre-couvreur-B</p>
+<p class="use">Ancre alternative</p>
+<p class="desc">Variante candide auprès d&#x27;une pile de tuiles. Référence de substitution.</p>
+<p class="tech"><span>3:2</span><span>50 mm · f/2.2</span><span class="pair">référence d&#x27;identité</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_115724_edc6ffa9-bffa-4ba4-9799-1ab58aa1b032.png" target="_blank" rel="noopener">Ouvrir</a></li>
+</ol></div>
+<div class="cat"><div class="cat-bar"><h2>A · Hero / Identité</h2><p class="cat-note">Ouvertures de page, negative space calibré pour titres et CTA</p></div><ol class="shots">
+<li class="shot"><div class="num">01</div><div>
+<p class="slug">hero-couvreur-toiture</p>
+<p class="use">Hero — page d&#x27;accueil</p>
+<p class="desc">Couvreur posant une tuile canal au mortier. Moitié supérieure gauche laissée vide pour le titre et le CTA.</p>
+<p class="tech"><span>16:9</span><span>24 mm · f/8</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120315_4a050cec-2022-4c56-83eb-6e54f2de6d8d.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">02</div><div>
+<p class="slug">hero-maison-mediterraneenne</p>
+<p class="use">Hero alternatif — haut de page service</p>
+<p class="desc">Maison corse en 3/4 surélevé, toiture entièrement lisible. Tiers droit libre.</p>
+<p class="tech"><span>16:9</span><span>35 mm · f/11</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120315_0b27f7e2-ffa7-4bba-9359-45561684265c.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">03</div><div>
+<p class="slug">hero-artisan-paysage</p>
+<p class="use">Hero — « Notre territoire » / À propos</p>
+<p class="desc">Artisan sur le faîtage, golfe du Valinco derrière. Deux tiers gauches en paysage.</p>
+<p class="tech"><span>16:9</span><span>35 mm · f/4</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120315_bf4264d1-d6a6-4643-966d-8a3e4e6916de.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">04</div><div>
+<p class="slug">hero-toiture-renovee</p>
+<p class="use">Hero — ouverture « Réalisations »</p>
+<p class="desc">Vue plongeante sur une toiture rénovée : noue zinc, faîtage, solin de cheminée.</p>
+<p class="tech"><span>16:9</span><span>24 mm · f/11</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120315_349cba26-bf4a-4045-a8d2-febc8e0f255e.png" target="_blank" rel="noopener">Ouvrir</a></li>
+</ol></div>
+<div class="cat"><div class="cat-bar"><h2>B · Entreprise / Artisan</h2><p class="cat-note">L&#x27;homme et le geste, sans portrait corporate</p></div><ol class="shots">
+<li class="shot"><div class="num">05</div><div>
+<p class="slug">portrait-couvreur</p>
+<p class="use">« Qui sommes-nous » — page À propos</p>
+<p class="desc">Portrait éditorial, regard hors axe, aucune pose corporate.</p>
+<p class="tech"><span>3:4</span><span>85 mm · f/2.0</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120315_391450b3-eebf-4c0c-9a77-2c68ba3ee1e2.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">06</div><div>
+<p class="slug">artisan-preparation</p>
+<p class="use">« Notre méthode », étape 1</p>
+<p class="desc">Traçage d&#x27;une feuille de zinc sur tréteaux, matériel de chantier autour.</p>
+<p class="tech"><span>3:2</span><span>50 mm · f/2.8</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120315_5a8b7214-e81a-4e92-a006-f74f2f62fca4.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">07</div><div>
+<p class="slug">detail-mains-geste</p>
+<p class="use">Respiration graphique — savoir-faire</p>
+<p class="desc">Mains calleuses scellant une tuile dans son bain de mortier de chaux.</p>
+<p class="tech"><span>1:1</span><span>100 mm macro · f/4</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120315_7cd90c8a-c583-4796-8c18-0e00dc8bfa4c.png" target="_blank" rel="noopener">Ouvrir</a></li>
+</ol></div>
+<div class="cat"><div class="cat-bar"><h2>C · Couverture &amp; toiture</h2><p class="cat-note">Pose, manutention, résultat</p></div><ol class="shots">
+<li class="shot"><div class="num">08</div><div>
+<p class="slug">couverture-pose</p>
+<p class="use">Page Couverture — visuel principal</p>
+<p class="desc">Pose de couverture : chevrons, écran, liteaunage puis tuiles, séquence lisible.</p>
+<p class="tech"><span>3:2</span><span>50 mm · f/4</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120316_23924a7f-8d0b-440b-827c-1f50a1add91c.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">09</div><div>
+<p class="slug">couverture-tuiles</p>
+<p class="use">Page Couverture — visuel secondaire</p>
+<p class="desc">Manutention d&#x27;une pile de tuiles sur plancher d&#x27;échafaudage.</p>
+<p class="tech"><span>3:2</span><span>35 mm · f/3.5</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120315_fe86274f-f3a1-4eff-87b5-6a5837883101.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">10</div><div>
+<p class="slug">couverture-terminee</p>
+<p class="use">Bandeau bas de page service</p>
+<p class="desc">Toiture achevée lue contre les toits voisins du village.</p>
+<p class="tech"><span>16:9</span><span>35 mm · f/11</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120315_7e480776-be02-4646-b8d4-b0b239d31ebe.png" target="_blank" rel="noopener">Ouvrir</a></li>
+</ol></div>
+<div class="cat"><div class="cat-bar"><h2>D · Rénovation</h2><p class="cat-note">Séquence avant / pendant / après</p></div><ol class="shots">
+<li class="shot"><div class="num">11</div><div>
+<p class="slug">renovation-avant</p>
+<p class="use">Rénovation — volet AVANT</p>
+<p class="desc">Toiture affaissée, tuiles glissées, faîtage désagrégé, gouttière décrochée.</p>
+<p class="tech"><span>3:2</span><span>35 mm · f/11</span><span class="pair">↔ paire avant/après</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120315_b3e1cc0b-e41f-4a72-ad42-f28af238a0b9.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">12</div><div>
+<p class="slug">renovation-pendant</p>
+<p class="use">Rénovation — étape chantier</p>
+<p class="desc">Toiture à moitié déposée : chevrons nus, écran, liteaux, premiers rangs reposés.</p>
+<p class="tech"><span>3:2</span><span>35 mm · f/5.6</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120315_2069a621-8e3d-48a3-81b8-a8e351d781d4.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">13</div><div>
+<p class="slug">renovation-apres</p>
+<p class="use">Rénovation — volet APRÈS</p>
+<p class="desc">Même maison, même cadrage, même lumière. Seule la toiture change.</p>
+<p class="tech"><span>3:2</span><span>35 mm · f/11</span><span class="pair">↔ paire avant/après</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120638_e223ac5b-40c1-42d0-94d1-49070b908fa9.png" target="_blank" rel="noopener">Ouvrir</a></li>
+</ol></div>
+<div class="cat"><div class="cat-bar"><h2>E · Réparation &amp; recherche de fuite</h2><p class="cat-note">Inspection, intervention, diagnostic</p></div><ol class="shots">
+<li class="shot"><div class="num">14</div><div>
+<p class="slug">reparation-inspection</p>
+<p class="use">Page Recherche de fuite</p>
+<p class="desc">Inspection : soulèvement d&#x27;une tuile de couvert, humidimètre à portée.</p>
+<p class="tech"><span>3:2</span><span>50 mm · f/3.5</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120640_f4766e5e-8c1f-4792-943f-aeaa2ad92879.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">15</div><div>
+<p class="slug">reparation-intervention</p>
+<p class="use">Page Réparation</p>
+<p class="desc">Zone d&#x27;environ 1 m² ouverte, tuiles triées, remplacement au bon recouvrement.</p>
+<p class="tech"><span>3:2</span><span>50 mm · f/4</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120638_1db7da34-3a6d-4126-8e7f-55e358cd0f90.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">16</div><div>
+<p class="slug">reparation-detail-fuite</p>
+<p class="use">Encart technique « Diagnostic »</p>
+<p class="desc">Solin zinc soulevé, bourrelet de mortier fissuré, tuile fendue, trace d&#x27;infiltration.</p>
+<p class="tech"><span>1:1</span><span>100 mm macro · f/5.6</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120639_d8bd5b3a-89dc-43b4-b4e5-871af24d3079.png" target="_blank" rel="noopener">Ouvrir</a></li>
+</ol></div>
+<div class="cat"><div class="cat-bar"><h2>F · Étanchéité</h2><p class="cat-note">Mise en œuvre et détail de relevé</p></div><ol class="shots">
+<li class="shot"><div class="num">17</div><div>
+<p class="slug">etancheite-intervention</p>
+<p class="use">Page Étanchéité — visuel principal</p>
+<p class="desc">Déroulage d&#x27;une membrane bitumineuse, recouvrements réguliers, chalumeau éteint.</p>
+<p class="tech"><span>3:2</span><span>35 mm · f/5.6</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120638_ea0c0593-dede-47b4-bd5b-81b046096535.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">18</div><div>
+<p class="slug">etancheite-detail</p>
+<p class="use">Page Étanchéité — encart matériau</p>
+<p class="desc">Relevé d&#x27;étanchéité en pied d&#x27;acrotère : gorge, bande de solin zinc, mastic.</p>
+<p class="tech"><span>1:1</span><span>100 mm macro · f/5.6</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120638_ddf4f3bc-ce08-4c91-8840-a4032118255b.png" target="_blank" rel="noopener">Ouvrir</a></li>
+</ol></div>
+<div class="cat"><div class="cat-bar"><h2>G · Zinguerie &amp; gouttières</h2><p class="cat-note">Pose et finitions soudées</p></div><ol class="shots">
+<li class="shot"><div class="num">19</div><div>
+<p class="slug">zinguerie-gouttiere</p>
+<p class="use">Page Zinguerie — visuel principal</p>
+<p class="desc">Pose d&#x27;une gouttière demi-ronde zinc sur crochets, ligne de pente marquée.</p>
+<p class="tech"><span>3:2</span><span>50 mm · f/4</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120639_1f681eda-3258-4a8d-bf02-bbd87f1d697b.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">20</div><div>
+<p class="slug">zinguerie-detail</p>
+<p class="use">Page Zinguerie — encart finitions</p>
+<p class="desc">Noue zinc pliée à la main, joint soudé à l&#x27;étain, tuiles coupées au cordeau.</p>
+<p class="tech"><span>1:1</span><span>100 mm macro · f/5.6</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120910_7207e76c-176c-4833-b10f-bb687e22bc92.png" target="_blank" rel="noopener">Ouvrir</a></li>
+</ol></div>
+<div class="cat"><div class="cat-bar"><h2>H · Nettoyage &amp; démoussage</h2><p class="cat-note">Séquence avant / pendant / après</p></div><ol class="shots">
+<li class="shot"><div class="num">21</div><div>
+<p class="slug">demoussage-avant</p>
+<p class="use">Démoussage — volet AVANT</p>
+<p class="desc">Coussins de mousse dans les canaux, lichen, algues, gouttière encombrée.</p>
+<p class="tech"><span>3:2</span><span>35 mm · f/11</span><span class="pair">↔ paire avant/après</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120639_2d19c093-4e0c-42ab-bf32-fa3c6da21295.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">22</div><div>
+<p class="slug">demoussage-pendant</p>
+<p class="use">Démoussage — étape intervention</p>
+<p class="desc">Lance basse pression, jet dirigé du faîtage vers l&#x27;égout, limite de propreté nette.</p>
+<p class="tech"><span>3:2</span><span>35 mm · f/4.5</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120639_1887a616-badf-44be-87ed-779a05bf9aab.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">23</div><div>
+<p class="slug">demoussage-apres</p>
+<p class="use">Démoussage — volet APRÈS</p>
+<p class="desc">Même maison, même cadrage. Toiture nettoyée mais toujours patinée, jamais neuve.</p>
+<p class="tech"><span>3:2</span><span>35 mm · f/11</span><span class="pair">↔ paire avant/après</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120827_6fbe21ec-2f6e-4ee5-b0be-eed679ea9357.png" target="_blank" rel="noopener">Ouvrir</a></li>
+</ol></div>
+<div class="cat"><div class="cat-bar"><h2>I · Détails / savoir-faire</h2><p class="cat-note">Respirations graphiques</p></div><ol class="shots">
+<li class="shot"><div class="num">24</div><div>
+<p class="slug">detail-faitage</p>
+<p class="use">Mosaïque savoir-faire</p>
+<p class="desc">Faîtière demi-ronde scellée au mortier de chaux, joint tiré à la truelle.</p>
+<p class="tech"><span>1:1</span><span>100 mm macro · f/5.6</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120639_7e0212e6-ee79-4c30-8aa9-2010e249e9de.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">25</div><div>
+<p class="slug">detail-outils</p>
+<p class="use">« Nos gestes » — nature morte</p>
+<p class="desc">Ceinture, marteau de couvreur, cisaille, cordeau, mètre pliant, truelle.</p>
+<p class="tech"><span>1:1</span><span>90 mm macro · f/5.6</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120638_bcecbee7-a4d3-4447-a568-f8129a707358.png" target="_blank" rel="noopener">Ouvrir</a></li>
+</ol></div>
+<div class="cat"><div class="cat-bar"><h2>J · Propriano / Corse-du-Sud</h2><p class="cat-note">Contexte, perceptible mais jamais touristique</p></div><ol class="shots">
+<li class="shot"><div class="num">26</div><div>
+<p class="slug">contexte-propriano</p>
+<p class="use">Page « Zone d&#x27;intervention »</p>
+<p class="desc">Rue résidentielle des hauteurs de Propriano, toitures étagées.</p>
+<p class="tech"><span>16:9</span><span>35 mm · f/11</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120828_918e96d5-5706-491d-94c8-ab0f7c0b1ab0.png" target="_blank" rel="noopener">Ouvrir</a></li>
+<li class="shot"><div class="num">27</div><div>
+<p class="slug">contexte-valinco</p>
+<p class="use">Bandeau « Nos communes »</p>
+<p class="desc">Toiture au premier plan, arrière-pays du Valinco en plans étagés.</p>
+<p class="tech"><span>16:9</span><span>50 mm · f/8</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120827_e4cf4ef3-3ace-413e-9d87-003c4326672b.png" target="_blank" rel="noopener">Ouvrir</a></li>
+</ol></div>
+<div class="cat"><div class="cat-bar"><h2>K · Contact / conversion</h2><p class="cat-note">Bloc de conversion</p></div><ol class="shots">
+<li class="shot"><div class="num">28</div><div>
+<p class="slug">contact-cta</p>
+<p class="use">« Un projet de toiture ? Parlons-en. »</p>
+<p class="desc">Fin de journée au fourgon. Tiers droit entièrement libre pour le CTA et le 07 44 81 79 45.</p>
+<p class="tech"><span>16:9</span><span>35 mm · f/4</span></p>
+</div><a class="open" href="https://d8j0ntlcm91z4.cloudfront.net/user_3DdKHwBQMLKV3xoFSooUGuIINua/hf_20260907_120828_5cd16df7-58b4-4d74-9b8b-d5094ae0414f.png" target="_blank" rel="noopener">Ouvrir</a></li>
+</ol></div>
+</section>
+<footer><span>NG Couvreur · Propriano (2A)</span><span>+33 7 44 81 79 45</span><span>Généré via Higgsfield · nano_banana_pro 2K</span></footer>
+</div>
