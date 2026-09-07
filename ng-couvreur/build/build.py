@@ -121,10 +121,35 @@ FOCUS = {
     "27": "50% 65%",   # toiture au premier plan
 }
 
+_WIDTHS_CACHE = {}
+
+def available_widths(num):
+    """Largeurs réellement disponibles sur le disque.
+
+    Le srcset ne doit jamais être déduit de dimensions supposées : il se lit
+    sur les fichiers que optimize-images.py a effectivement produits. Sinon le
+    HTML référence des variantes qui n'existent pas et le navigateur affiche
+    une image cassée.
+    """
+    if num in _WIDTHS_CACHE:
+        return _WIDTHS_CACHE[num]
+    d = IMG[num]
+    folder = os.path.join(OUT, "assets", "img")
+    got = []
+    for w in LADDERS[d["ratio"]]:
+        base = os.path.join(folder, "%s-%s-%d" % (num, d["name"], w))
+        if all(os.path.exists(base + "." + ext) for ext in ("avif", "webp", "jpg")):
+            got.append(w)
+    if not got:
+        # Aucune variante sur le disque : on retombe sur l'échelle théorique,
+        # pour que le build reste utilisable sans passe d'optimisation.
+        got = [w for w in LADDERS[d["ratio"]] if w <= d["w"]]
+    _WIDTHS_CACHE[num] = got
+    return got
+
 def srcset(num, ext):
     d = IMG[num]
-    widths = [w for w in LADDERS[d["ratio"]] if w <= d["w"]]
-    return ", ".join("%s-%d.%s %dw" % (e(d["stem"]), w, ext, w) for w in widths)
+    return ", ".join("%s-%d.%s %dw" % (e(d["stem"]), w, ext, w) for w in available_widths(num))
 
 def img_tag(num, cls="", sizes="100vw", eager=False):
     """<picture> complet : AVIF, puis WebP, puis JPEG en dernier recours."""
@@ -135,8 +160,9 @@ def img_tag(num, cls="", sizes="100vw", eager=False):
                    'loading="eager" fetchpriority="high"' if eager else 'loading="lazy"',
                    (' class="%s"' % e(cls)) if cls else ""))
 
-    fw = FALLBACK_W[d["ratio"]]
-    fw = min(fw, d["w"])
+    widths = available_widths(num)
+    target = FALLBACK_W[d["ratio"]]
+    fw = min(widths, key=lambda w: (abs(w - target), w))
     fh = round(d["h"] * fw / d["w"])
     style = ""
     if num in FOCUS:
@@ -399,7 +425,8 @@ def og_image_url(num):
     d = IMG[num or "01"]
     if not IMAGES_LOCAL:
         return d["cdn"]
-    w = min(1280, d["w"])
+    widths = available_widths(num or "01")
+    w = min(widths, key=lambda x: (abs(x - 1280), x))
     return SITE_ORIGIN + d["stem"][len(BASE):] + "-%d.jpg" % w
 
 def head(title, meta, path, og_img="01", schema=""):

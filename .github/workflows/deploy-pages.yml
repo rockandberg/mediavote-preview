@@ -43,6 +43,12 @@ jobs:
           NG_BASE: '/mediavote-preview/ng-couvreur/site'
         run: python3 ng-couvreur/build/build.py
 
+      - name: Vérifier que toute image référencée existe
+        env:
+          NG_SITE_ORIGIN: 'https://rockandberg.github.io/mediavote-preview/ng-couvreur/site'
+          NG_BASE: '/mediavote-preview/ng-couvreur/site'
+        run: python3 ng-couvreur/build/verify-images.py
+
       - name: Contrôler le résultat
         run: |
           set -e
@@ -55,6 +61,7 @@ jobs:
             echo "Des images pointent encore vers le CDN d'origine." >&2
             exit 1
           fi
+          echo "Poids des images publiées :"
           du -sh ng-couvreur/site/assets/img
 
       - name: Écarter les fichiers qui n'ont pas à être publiés

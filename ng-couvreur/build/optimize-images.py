@@ -51,17 +51,18 @@ def fetch(url, dest):
 def variants(row):
     num, name, ratio, urlsrc = row["num"], row["nom"], row["ratio"], row["url"]
     if ratio not in LADDERS:
-        return num, 0, "rapport inconnu : %s" % ratio
+        return num, 0, "rapport inconnu : %s" % ratio, "?", ratio
     src = os.path.join(CACHE, "%s-%s.png" % (num, name))
     try:
         fetch(urlsrc, src)
     except Exception as ex:
-        return num, 0, "téléchargement impossible : %s" % ex
+        return num, 0, "téléchargement impossible : %s" % ex, "?", ratio
 
     made = 0
     with Image.open(src) as im:
         im = im.convert("RGB")
         base_w = im.width
+        real = "%dx%d" % (im.width, im.height)
         for w in LADDERS[ratio]:
             if w > base_w:          # on n'agrandit jamais
                 continue
@@ -76,7 +77,7 @@ def variants(row):
             if HAS_AVIF:
                 rs.save(stem + ".avif", "AVIF", quality=Q_AVIF, speed=AVIF_SPEED)
                 made += 1
-    return num, made, None
+    return num, made, None, real, ratio
 
 
 def main():
@@ -91,11 +92,16 @@ def main():
     errors = []
     total = 0
     with cf.ThreadPoolExecutor(max_workers=4) as pool:
-        for num, made, err in pool.map(variants, rows):
+        expected = {"16:9": "2752x1536", "3:2": "2528x1696",
+                    "1:1": "2048x2048", "3:4": "1792x2400"}
+        for num, made, err, real, ratio in pool.map(variants, rows):
             if err:
                 errors.append((num, err)); print("  %-4s ÉCHEC  %s" % (num, err))
             else:
-                total += made; print("  %-4s %2d fichiers" % (num, made))
+                total += made
+                flag = "" if real == expected.get(ratio) else "  ← DIMENSIONS INATTENDUES"
+                print("  %-4s %-6s source %-10s %2d fichiers%s"
+                      % (num, ratio, real, made, flag))
 
     weight = sum(os.path.getsize(os.path.join(OUTDIR, f)) for f in os.listdir(OUTDIR)
                  if not f.startswith("."))
