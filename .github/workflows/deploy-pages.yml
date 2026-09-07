@@ -57,6 +57,18 @@ jobs:
           fi
           du -sh ng-couvreur/site/assets/img
 
+      - name: Écarter les fichiers qui n'ont pas à être publiés
+        run: |
+          set -e
+          # Les originaux téléchargés pour fabriquer les dérivés : plusieurs
+          # centaines de Mo qui n'ont rien à faire dans la publication.
+          rm -rf ng-couvreur/.cache-originaux
+          # Sources de fabrication : inutiles au site servi.
+          rm -rf ng-couvreur/build
+          echo "Poids publié :"
+          du -sh . --exclude=.git
+          du -sh ng-couvreur/site/assets/img
+
       - uses: actions/configure-pages@v5
         with:
           enablement: true
