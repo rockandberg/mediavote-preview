@@ -24,9 +24,11 @@ OUT  = os.path.join(ROOT, "site")     # ng-couvreur/site/
 # ---------------------------------------------------------------------------
 # §1  CONFIGURATION
 # ---------------------------------------------------------------------------
-PREVIEW      = True   # True = noindex + robots Disallow. Passer à False en prod.
-SITE_ORIGIN  = "https://www.ngcouvreur.fr"      # ← domaine de production (à confirmer)
-BASE         = "/mediavote-preview/ng-couvreur/site"  # préfixe de service GitHub Pages
+# Surchargeables par l'environnement, pour que la CI construise aux bonnes URLs
+# sans modifier ce fichier.
+PREVIEW      = os.environ.get("NG_PREVIEW", "1") != "0"
+SITE_ORIGIN  = os.environ.get("NG_SITE_ORIGIN", "https://www.ngcouvreur.fr").rstrip("/")
+BASE         = os.environ.get("NG_BASE", "/mediavote-preview/ng-couvreur/site").rstrip("/")
 
 NOM       = "NG Couvreur"
 VILLE     = "Propriano"
@@ -36,7 +38,7 @@ TEL_HREF  = "tel:+33744817945"
 TEL_E164  = "+33744817945"
 
 # Point de bascule des visuels : CDN Higgsfield → fichiers locaux
-IMAGES_LOCAL = False
+IMAGES_LOCAL = True
 CDN_ORIGIN   = "https://d8j0ntlcm91z4.cloudfront.net"
 
 # ---------------------------------------------------------------------------
@@ -84,11 +86,10 @@ def load_images():
             if n not in ALT:
                 continue
             w, h = DIMS[row["ratio"]]
-            local = "%s/assets/img/%s-%s.jpg" % (BASE, n, row["nom"])
             imgs[n] = {
-                "src": local if IMAGES_LOCAL else row["url"],
-                "w": w, "h": h, "ratio": row["ratio"],
+                "cdn": row["url"], "w": w, "h": h, "ratio": row["ratio"],
                 "alt": ALT[n], "name": row["nom"],
+                "stem": "%s/assets/img/%s-%s" % (BASE, n, row["nom"]),
             }
     missing = sorted(set(ALT) - set(imgs))
     if missing:
@@ -100,16 +101,60 @@ IMG = load_images()
 def e(s):
     return html.escape(str(s), quote=True)
 
-def img_tag(num, cls="", sizes="100vw", eager=False):
+# Échelles de largeurs — doivent rester identiques à celles de optimize-images.py
+LADDERS = {
+    "16:9": [640, 960, 1280, 1920, 2560],
+    "3:2":  [480, 720, 960, 1440, 1920],
+    "1:1":  [400, 600, 800, 1200],
+    "3:4":  [480, 720, 960, 1200],
+}
+FALLBACK_W = {"16:9": 1280, "3:2": 960, "1:1": 800, "3:4": 720}
+
+# Recadrage : où doit rester le sujet quand la photo est rognée (mobile surtout).
+# Par défaut le centre ; ces visuels ont leur sujet ailleurs.
+FOCUS = {
+    "01": "62% 55%",   # couvreur assis en bas à droite
+    "03": "70% 50%",   # artisan sur le tiers droit
+    "22": "68% 45%",   # lance et limite de propreté en haut à droite
+    "28": "30% 55%",   # artisan et fourgon sur le tiers gauche
+    "09": "40% 50%",
+    "27": "50% 65%",   # toiture au premier plan
+}
+
+def srcset(num, ext):
     d = IMG[num]
+    widths = [w for w in LADDERS[d["ratio"]] if w <= d["w"]]
+    return ", ".join("%s-%d.%s %dw" % (e(d["stem"]), w, ext, w) for w in widths)
+
+def img_tag(num, cls="", sizes="100vw", eager=False):
+    """<picture> complet : AVIF, puis WebP, puis JPEG en dernier recours."""
+    d = IMG[num]
+    if not IMAGES_LOCAL:
+        return ('<img src="%s" alt="%s" width="%d" height="%d" decoding="async" %s%s>'
+                % (e(d["cdn"]), e(d["alt"]), d["w"], d["h"],
+                   'loading="eager" fetchpriority="high"' if eager else 'loading="lazy"',
+                   (' class="%s"' % e(cls)) if cls else ""))
+
+    fw = FALLBACK_W[d["ratio"]]
+    fw = min(fw, d["w"])
+    fh = round(d["h"] * fw / d["w"])
+    style = ""
+    if num in FOCUS:
+        style = ' style="object-position:%s"' % FOCUS[num]
+    loading = ('loading="eager" fetchpriority="high"' if eager
+               else 'loading="lazy" fetchpriority="low"')
     return (
-        '<img src="%s" alt="%s" width="%d" height="%d" sizes="%s"%s '
-        'decoding="async" %s>' % (
-            e(d["src"]), e(d["alt"]), d["w"], d["h"], e(sizes),
-            (' class="%s"' % e(cls)) if cls else "",
-            'loading="eager" fetchpriority="high"' if eager else 'loading="lazy"',
-        )
-    )
+        '<picture>'
+        '<source type="image/avif" srcset="%s" sizes="%s">'
+        '<source type="image/webp" srcset="%s" sizes="%s">'
+        '<img src="%s-%d.jpg" srcset="%s" sizes="%s" alt="%s" '
+        'width="%d" height="%d" decoding="async" %s%s%s>'
+        '</picture>'
+    ) % (srcset(num, "avif"), e(sizes),
+         srcset(num, "webp"), e(sizes),
+         e(d["stem"]), fw, srcset(num, "jpg"), e(sizes), e(d["alt"]),
+         fw, fh, loading,
+         (' class="%s"' % e(cls)) if cls else "", style)
 
 ARROW = ('<svg width="15" height="10" viewBox="0 0 15 10" fill="none" aria-hidden="true">'
          '<path d="M0 5h13M9.5 1 13.5 5 9.5 9" stroke="currentColor" stroke-width="1.8"/></svg>')
@@ -349,6 +394,14 @@ def abs_url(path=""):
 # ---------------------------------------------------------------------------
 # §6  GABARIT
 # ---------------------------------------------------------------------------
+def og_image_url(num):
+    """URL absolue d'une variante servie — pour Open Graph et JSON-LD."""
+    d = IMG[num or "01"]
+    if not IMAGES_LOCAL:
+        return d["cdn"]
+    w = min(1280, d["w"])
+    return SITE_ORIGIN + d["stem"][len(BASE):] + "-%d.jpg" % w
+
 def head(title, meta, path, og_img="01", schema=""):
     robots = "noindex, nofollow" if PREVIEW else "index, follow"
     preconnect = ""
@@ -356,8 +409,12 @@ def head(title, meta, path, og_img="01", schema=""):
         preconnect = ('\n  <link rel="preconnect" href="%s" crossorigin>'
                       '\n  <link rel="dns-prefetch" href="%s">' % (CDN_ORIGIN, CDN_ORIGIN))
     hero_pre = ""
-    if og_img:
-        hero_pre = '\n  <link rel="preload" as="image" href="%s" fetchpriority="high">' % e(IMG[og_img]["src"])
+    if og_img and IMAGES_LOCAL:
+        d = IMG[og_img]
+        hero_pre = ('\n  <link rel="preload" as="image" type="image/avif" fetchpriority="high"'
+                    '\n        imagesrcset="%s" imagesizes="100vw">' % srcset(og_img, "avif"))
+    elif og_img:
+        hero_pre = '\n  <link rel="preload" as="image" href="%s" fetchpriority="high">' % e(IMG[og_img]["cdn"])
     return """<!DOCTYPE html>
 <html lang="fr" class="no-js">
 <head>
@@ -389,7 +446,7 @@ def head(title, meta, path, og_img="01", schema=""):
 <a class="skip" href="#contenu">Aller au contenu</a>
 """ % {
   "robots": robots, "title": e(title), "meta": e(meta),
-  "canon": e(abs_url(path)), "ogimg": e(IMG[og_img]["src"] if og_img else IMG["01"]["src"]),
+  "canon": e(abs_url(path)), "ogimg": e(og_image_url(og_img)),
   "pre": preconnect, "heropre": hero_pre, "css": e(url("assets/css/site.css")),
   "schema": schema,
 }
@@ -530,7 +587,7 @@ LOCALBUSINESS = """{
   "knowsLanguage":"fr-FR",
   "hasOfferCatalog":{"@type":"OfferCatalog","name":"Travaux de toiture","itemListElement":[%(svc)s]}
 }""" % {
-  "o": SITE_ORIGIN, "tel": TEL_E164, "img": IMG["01"]["src"],
+  "o": SITE_ORIGIN, "tel": TEL_E164, "img": og_image_url("01"),
   "zones": ",".join('{"@type":"City","name":"%s"}' % c["nom"] for c in COMMUNES),
   "svc": ",".join('{"@type":"Offer","itemOffered":{"@type":"Service","name":"%s"}}'
                   % re.sub("&nbsp;|&amp;", lambda m: " " if m.group() == "&nbsp;" else "&", s["nav"])
@@ -919,7 +976,7 @@ def page_conseil(a):
            '"description":"%s","image":"%s","mainEntityOfPage":"%s",'
            '"author":{"@type":"Organization","name":"NG Couvreur"},'
            '"publisher":{"@type":"Organization","name":"NG Couvreur"},"inLanguage":"fr-FR"}'
-           % (a["titre"].replace('"', ""), a["resume"].replace('"', ""), IMG[a["img"]]["src"], abs_url(path)))
+           % (a["titre"].replace('"', ""), a["resume"].replace('"', ""), og_image_url(a["img"]), abs_url(path)))
     h = head(a["title"], a["meta"], path, og_img=a["img"], schema=jsonld(art, breadcrumb(trail)))
     write("conseils/%s" % a["slug"], h + header("conseils/") + body + footer())
 
@@ -1147,18 +1204,31 @@ def sitemap(paths):
     open(os.path.join(OUT, "robots.txt"), "w", encoding="utf-8").write(robots)
 
 def main():
+    # On repart d'un dossier propre, MAIS on préserve assets/img : les dérivés
+    # web y sont déposés par optimize-images.py, qui tourne avant nous.
     if os.path.isdir(OUT):
-        shutil.rmtree(OUT)
+        keep = os.path.join(OUT, "assets", "img")
+        for entry in os.listdir(OUT):
+            path = os.path.join(OUT, entry)
+            if entry != "assets":
+                shutil.rmtree(path) if os.path.isdir(path) else os.remove(path)
+        assets = os.path.join(OUT, "assets")
+        if os.path.isdir(assets):
+            for entry in os.listdir(assets):
+                path = os.path.join(assets, entry)
+                if path != keep:
+                    shutil.rmtree(path) if os.path.isdir(path) else os.remove(path)
     os.makedirs(os.path.join(OUT, "assets", "css"), exist_ok=True)
     os.makedirs(os.path.join(OUT, "assets", "js"), exist_ok=True)
     os.makedirs(os.path.join(OUT, "assets", "img"), exist_ok=True)
     shutil.copy(os.path.join(HERE, "site.css"), os.path.join(OUT, "assets", "css", "site.css"))
     shutil.copy(os.path.join(HERE, "site.js"),  os.path.join(OUT, "assets", "js",  "site.js"))
     open(os.path.join(OUT, ".nojekyll"), "w").close()
-    open(os.path.join(OUT, "assets", "img", ".gitkeep"), "w").write(
-        "# Destination des visuels une fois exportés depuis Higgsfield.\n"
-        "# Nommage attendu : <num>-<nom>.jpg (ex. 01-hero-couvreur-toiture.jpg)\n"
-        "# Puis IMAGES_LOCAL = True dans build/build.py et relancer le build.\n")
+    gitkeep = os.path.join(OUT, "assets", "img", ".gitkeep")
+    if not os.path.exists(gitkeep):
+        open(gitkeep, "w").write(
+            "# Dérivés web produits par build/optimize-images.py.\n"
+            "# Régénérés à chaque déploiement, jamais versionnés.\n")
 
     paths = [""]
     page_home()

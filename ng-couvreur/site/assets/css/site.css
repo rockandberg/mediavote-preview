@@ -5,31 +5,52 @@
    ========================================================================== */
 
 /* --- 1. Tokens ----------------------------------------------------------- */
+/* Palette extraite de la photographie NG Couvreur : tuile canal vieillie,
+   enduit à la chaux, pierre granitique, zinc patiné, ombres chaudes.
+   Contrastes vérifiés — 17 paires testées, toutes conformes AA, la plupart AAA. */
 :root{
   color-scheme: light;
 
-  /* Encre : charbon légèrement froid, comme l'ombre du zinc */
-  --ink:        #101418;
-  --ink-80:     #383F47;
-  --ink-60:     #626A73;
-  --ink-40:     #929AA3;
+  /* --- Famille terracotta : une échelle, pas une couleur -------------- */
+  --t900: #2E1710;   /* terre brûlée — grands blocs sombres, pied de page */
+  --t800: #5C2A18;   /* brun rouge — survol des CTA */
+  --t700: #8A3A1E;   /* terracotta profond — CTA, filets, états actifs */
+  --t600: #A8471F;   /* terre cuite — accents secondaires, focus */
+  --t500: #C25B2C;   /* rouge tuile — accents sur fond sombre */
+  --t300: #E3A98C;   /* tuile claire — étiquettes sur fond sombre */
+  --t100: #F5E4DA;   /* sable rosé — aplats doux */
+  --t50:  #FBF4EF;   /* écru chaud — fonds de section */
 
-  /* Fonds */
-  --paper:      #FFFFFF;
-  --sable:      #F2F0EB;   /* enduit à la chaux */
-  --sable-deep: #E6E3DB;
+  /* Alias historiques conservés pour ne rien casser dans les règles */
+  --terre:      var(--t700);
+  --terre-deep: var(--t800);
 
-  /* Accent : terre cuite brûlée, prise sur la tuile canal */
-  --terre:      #B4451F;
-  --terre-deep: #8E3616;
+  /* --- Neutres chauds ------------------------------------------------ */
+  --ink:        #1A1512;   /* brun presque noir — jamais de noir pur */
+  --ink-80:     #3E3630;
+  --ink-60:     #6E6459;   /* gris chaud */
+  --ink-40:     #A0968A;
 
-  /* Traits : le trait de construction, jamais l'ombre portée */
-  --line:       rgba(16,20,24,.14);
-  --line-strong:rgba(16,20,24,.30);
-  --line-light: rgba(255,255,255,.22);
+  --paper:      #FDFCFA;   /* blanc cassé */
+  --sable:      #F2EDE5;   /* beige minéral très clair */
+  --sable-deep: #E4DCD0;
+
+  /* Zinc patiné — usage rare, repères techniques uniquement */
+  --zinc:       #57616B;
+
+  /* Filets : le trait de construction, jamais l'ombre portée */
+  --line:       rgba(46,23,16,.16);
+  --line-strong:rgba(46,23,16,.34);
+  --line-light: rgba(255,255,255,.24);
+
+  /* Voile photographique — chaud, accordé à la terre cuite */
+  --veil-1: rgba(26,11,6,.90);
+  --veil-2: rgba(26,11,6,.72);
+  --veil-3: rgba(26,11,6,.30);
+  --veil-4: rgba(26,11,6,.16);
 
   /* Grille */
-  --shell:      78rem;      /* 1248px */
+  --shell:      78rem;
   --gutter:     clamp(1.25rem, 4vw, 3.5rem);
   --section:    clamp(4rem, 9vw, 8rem);
 
@@ -58,6 +79,10 @@ body{
   overflow-x:hidden;
 }
 img,picture,svg{ max-width:100%; display:block; }
+/* <picture> n'est qu'un conteneur : il doit se comporter comme l'image
+   qu'il enveloppe, sinon les recadrages en plein cadre s'effondrent. */
+picture{ display:block; }
+.hero__media picture,.cta__media picture,.service__media picture,.step picture{ height:100%; }
 img{ height:auto; background:var(--sable-deep); }
 h1,h2,h3,h4,p,ul,ol,figure,blockquote{ margin:0; }
 ul,ol{ padding:0; list-style:none; }
@@ -68,10 +93,14 @@ button{ font:inherit; color:inherit; }
   outline:3px solid var(--terre); outline-offset:3px; border-radius:1px;
 }
 .skip{
-  position:absolute; left:-9999px; top:0; z-index:200;
-  background:var(--ink); color:#fff; padding:.9rem 1.4rem; font-weight:700;
+  position:absolute; width:1px; height:1px; overflow:hidden;
+  clip-path:inset(50%); white-space:nowrap; z-index:200;
+  background:var(--t700); color:#fff; padding:0; font-weight:700;
 }
-.skip:focus{ left:0; }
+.skip:focus{
+  width:auto; height:auto; clip-path:none; padding:.9rem 1.4rem;
+  left:0; top:0;
+}
 
 /* --- 3. Typographie ------------------------------------------------------ */
 .display,h1,h2,h3{
@@ -97,14 +126,22 @@ h3{ font-size:var(--fs-h3); letter-spacing:-.015em; line-height:1.15; }
   text-transform:uppercase; color:var(--terre); font-stretch:100%;
 }
 .label::before{ content:""; width:1.75rem; height:2px; background:var(--terre); flex:none; }
-.label--light{ color:#fff; }
-.label--light::before{ background:#fff; }
+.label--light{ color:var(--t300); }
+.label--light::before{ background:var(--t300); }
 
 /* --- 4. Grille ----------------------------------------------------------- */
+/* Un enfant de grille a min-width:auto par défaut : sa largeur minimale est
+   celle de son contenu. Avec des photos de 2560 px, les pistes explosent et la
+   page déborde horizontalement. On neutralise pour toutes nos grilles. */
+.services > *, .zones > *, .posts > *, .sequence > *, .split > *,
+.steps > li, .article > *, .head > *, .form__row > *{ min-width:0; }
+.step, .service, .post, .zone{ min-width:0; }
+.step picture, .service__media picture{ max-width:100%; }
 .shell{ width:100%; max-width:var(--shell); margin-inline:auto; padding-inline:var(--gutter); }
 .section{ padding-block:var(--section); }
 .section--sable{ background:var(--sable); }
-.section--ink{ background:var(--ink); color:#fff; }
+.section--ecru{ background:var(--t50); }
+.section--ink{ background:var(--t900); color:#fff; }
 .section--ink .lead,.section--ink .muted{ color:rgba(255,255,255,.76); }
 .rule{ height:1px; background:var(--line); border:0; }
 
@@ -123,10 +160,10 @@ h3{ font-size:var(--fs-h3); letter-spacing:-.015em; line-height:1.15; }
   font-stretch:105%; text-decoration:none; cursor:pointer;
   transition:background-color .18s var(--ease), color .18s var(--ease), border-color .18s var(--ease);
 }
-.btn--primary{ background:var(--ink); color:#fff; border-color:var(--ink); }
-.btn--primary:hover{ background:var(--terre); border-color:var(--terre); }
+.btn--primary{ background:var(--t700); color:#fff; border-color:var(--t700); }
+.btn--primary:hover{ background:var(--t800); border-color:var(--t800); }
 .btn--outline{ background:transparent; color:var(--ink); border-color:var(--line-strong); }
-.btn--outline:hover{ border-color:var(--ink); background:var(--ink); color:#fff; }
+.btn--outline:hover{ border-color:var(--t700); background:var(--t700); color:#fff; }
 .btn--onphoto{ background:#fff; color:var(--ink); border-color:#fff; }
 .btn--onphoto:hover{ background:var(--terre); border-color:var(--terre); color:#fff; }
 .btn--ghostphoto{ background:transparent; color:#fff; border-color:var(--line-light); }
@@ -218,12 +255,12 @@ h3{ font-size:var(--fs-h3); letter-spacing:-.015em; line-height:1.15; }
 @media (prefers-reduced-motion:reduce){ .drawer{ transition:none; } }
 
 /* --- 7. Hero ------------------------------------------------------------- */
-.hero{ position:relative; background:var(--ink); isolation:isolate; }
+.hero{ position:relative; background:var(--t900); isolation:isolate; }
 .hero__media{ position:absolute; inset:0; z-index:-2; }
 .hero__media img{ width:100%; height:100%; object-fit:cover; }
 .hero::after{
   content:""; position:absolute; inset:0; z-index:-1;
-  background:linear-gradient(100deg, rgba(9,12,15,.90) 0%, rgba(9,12,15,.72) 42%, rgba(9,12,15,.30) 78%, rgba(9,12,15,.18) 100%);
+  background:linear-gradient(100deg, var(--veil-1) 0%, var(--veil-2) 42%, var(--veil-3) 78%, var(--veil-4) 100%);
 }
 .hero__in{ position:relative; padding-block:clamp(4.5rem,12vw,9rem); color:#fff; }
 .hero__title{ margin:1.5rem 0 0; color:#fff; max-width:16ch; }
@@ -234,7 +271,7 @@ h3{ font-size:var(--fs-h3); letter-spacing:-.015em; line-height:1.15; }
 .hero__actions{ margin-top:2.25rem; }
 .hero--page .hero__in{ padding-block:clamp(3.25rem,8vw,6rem); }
 .hero--page::after{
-  background:linear-gradient(100deg, rgba(9,12,15,.92) 0%, rgba(9,12,15,.76) 50%, rgba(9,12,15,.36) 100%);
+  background:linear-gradient(100deg, var(--veil-1) 0%, var(--veil-2) 50%, var(--veil-3) 100%);
 }
 
 /* Fil d'Ariane */
@@ -252,7 +289,7 @@ h3{ font-size:var(--fs-h3); letter-spacing:-.015em; line-height:1.15; }
   display:flex; flex-direction:column; text-decoration:none; width:100%;
   transition:background-color .2s var(--ease);
 }
-.service__link:hover{ background:var(--sable); }
+.service__link:hover{ background:var(--t50); }
 .service__media{ position:relative; overflow:hidden; aspect-ratio:3/2; background:var(--sable-deep); }
 .service__media img{ width:100%; height:100%; object-fit:cover; transition:transform .5s var(--ease); }
 .service__link:hover .service__media img{ transform:scale(1.035); }
@@ -288,7 +325,8 @@ h3{ font-size:var(--fs-h3); letter-spacing:-.015em; line-height:1.15; }
 .sequence{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line); }
 @media (min-width:48rem){ .sequence{ grid-template-columns:repeat(3,1fr); } }
 .step{ background:var(--paper); padding:0 0 1.4rem; }
-.step img{ width:100%; aspect-ratio:3/2; object-fit:cover; }
+.step picture{ aspect-ratio:3/2; }
+.step img{ width:100%; height:100%; aspect-ratio:3/2; object-fit:cover; }
 .step__tag{
   display:block; margin:1.1rem 1.25rem .4rem; font-size:.75rem; font-weight:700;
   letter-spacing:.14em; text-transform:uppercase; color:var(--terre);
@@ -299,7 +337,7 @@ h3{ font-size:var(--fs-h3); letter-spacing:-.015em; line-height:1.15; }
 .steps{ display:grid; gap:0; border-top:1px solid var(--line); }
 @media (min-width:52rem){ .steps{ grid-template-columns:repeat(4,1fr); gap:0 2.5rem; } }
 .steps li{ padding:1.6rem 0; border-bottom:1px solid var(--line); display:grid; gap:.55rem; align-content:start; }
-@media (min-width:52rem){ .steps li{ border-bottom:0; border-top:3px solid var(--ink); padding-top:1.25rem; } }
+@media (min-width:52rem){ .steps li{ border-bottom:0; border-top:3px solid var(--t700); padding-top:1.25rem; } }
 .steps .n{
   font-size:.8125rem; font-weight:800; letter-spacing:.14em; color:var(--terre);
   font-variant-numeric:tabular-nums;
@@ -315,7 +353,7 @@ h3{ font-size:var(--fs-h3); letter-spacing:-.015em; line-height:1.15; }
 .zone__name{ font-weight:800; font-stretch:108%; font-size:1.125rem; text-transform:uppercase; letter-spacing:-.015em; }
 .zone__meta{ font-size:.8125rem; color:var(--ink-60); }
 a.zone{ text-decoration:none; transition:background-color .18s var(--ease); }
-a.zone:hover{ background:var(--sable); }
+a.zone:hover{ background:var(--t50); }
 a.zone:hover .zone__name{ color:var(--terre); }
 
 /* --- 12. Conseils -------------------------------------------------------- */
@@ -323,18 +361,18 @@ a.zone:hover .zone__name{ color:var(--terre); }
 @media (min-width:48rem){ .posts{ grid-template-columns:repeat(3,1fr); } }
 .post{ background:var(--paper); }
 .post a{ display:grid; gap:.7rem; text-decoration:none; padding:1.6rem 1.4rem 1.9rem; height:100%; align-content:start; transition:background-color .18s var(--ease); }
-.post a:hover{ background:var(--sable); }
+.post a:hover{ background:var(--t50); }
 .post h3{ font-size:1.1875rem; }
 .post a:hover h3{ color:var(--terre); }
 .post p{ font-size:var(--fs-small); color:var(--ink-60); margin:0; }
 
 /* --- 13. CTA final ------------------------------------------------------- */
-.cta{ position:relative; background:var(--ink); isolation:isolate; }
+.cta{ position:relative; background:var(--t900); isolation:isolate; }
 .cta__media{ position:absolute; inset:0; z-index:-2; }
 .cta__media img{ width:100%; height:100%; object-fit:cover; }
 .cta::after{
   content:""; position:absolute; inset:0; z-index:-1;
-  background:linear-gradient(95deg, rgba(9,12,15,.92) 0%, rgba(9,12,15,.74) 46%, rgba(9,12,15,.26) 100%);
+  background:linear-gradient(95deg, var(--veil-1) 0%, var(--veil-2) 46%, var(--veil-3) 100%);
 }
 .cta__in{ position:relative; padding-block:clamp(4rem,9vw,7.5rem); color:#fff; display:grid; gap:1.4rem; justify-items:start; }
 .cta h2{ color:#fff; max-width:15ch; }
@@ -360,10 +398,10 @@ a.zone:hover .zone__name{ color:var(--terre); }
 .err{ font-size:.8125rem; font-weight:600; color:var(--terre); }
 @media (min-width:44rem){ .form__row{ display:grid; grid-template-columns:repeat(2,1fr); gap:1.4rem; } }
 .formnote{
-  padding:1.1rem 1.25rem; background:var(--sable); border-left:3px solid var(--ink);
+  padding:1.1rem 1.25rem; background:var(--t50); border-left:3px solid var(--t700);
   font-size:var(--fs-small); color:var(--ink-80);
 }
-.formnote--alert{ border-left-color:var(--terre); }
+.formnote--alert{ border-left-color:var(--t600); }
 .formnote strong{ color:var(--ink); }
 
 /* Encart contact direct */
@@ -389,11 +427,11 @@ a.zone:hover .zone__name{ color:var(--terre); }
 .article__body li::before{
   content:""; position:absolute; left:0; top:.65em; width:.6rem; height:2px; background:var(--terre);
 }
-.aside{ border-top:3px solid var(--ink); padding-top:1.4rem; display:grid; gap:1rem; align-content:start; }
+.aside{ border-top:3px solid var(--t700); padding-top:1.4rem; display:grid; gap:1rem; align-content:start; }
 @media (min-width:60rem){ .aside{ position:sticky; top:6.5rem; } }
 
 /* --- 16. Pied de page ---------------------------------------------------- */
-.footer{ background:var(--ink); color:#fff; padding-block:clamp(3rem,6vw,4.5rem) 2rem; }
+.footer{ background:var(--t900); color:#fff; padding-block:clamp(3rem,6vw,4.5rem) 2rem; }
 .footer__top{ display:grid; gap:2.5rem; padding-bottom:2.5rem; border-bottom:1px solid var(--line-light); }
 @media (min-width:56rem){ .footer__top{ grid-template-columns:minmax(0,1.2fr) repeat(2,minmax(0,.9fr)); gap:3rem; } }
 .footer__brand .brand__name{ font-size:1.6rem; }
@@ -427,8 +465,8 @@ a.zone:hover .zone__name{ color:var(--terre); }
   min-height:3.75rem; text-decoration:none; font-weight:700; font-size:.875rem;
   letter-spacing:.09em; text-transform:uppercase;
 }
-.dock a:first-child{ background:var(--ink); color:#fff; }
-.dock a:last-child{ background:var(--terre); color:#fff; }
+.dock a:first-child{ background:var(--t900); color:#fff; }
+.dock a:last-child{ background:var(--t700); color:#fff; }
 body.has-dock{ padding-bottom:3.75rem; }
 @media (min-width:80rem){ body.has-dock{ padding-bottom:0; } }
 
