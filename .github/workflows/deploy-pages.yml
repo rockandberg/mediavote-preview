@@ -1,0 +1,76 @@
+# Déploiement GitHub Pages du dépôt.
+#
+# Le site Media Vote (racine) est publié tel quel, sans transformation.
+# Le site NG Couvreur (/ng-couvreur/site/) est reconstruit à chaque déploiement :
+# les visuels sont téléchargés depuis leur source, optimisés en AVIF/WebP/JPEG
+# à plusieurs résolutions, puis les pages HTML sont générées.
+name: Déploiement Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Installer la chaîne d'images
+        run: python -m pip install --quiet --upgrade pip Pillow pillow-avif-plugin
+
+      - name: Optimiser les visuels NG Couvreur
+        run: python3 ng-couvreur/build/optimize-images.py
+
+      - name: Générer les pages NG Couvreur
+        env:
+          NG_PREVIEW: '1'
+          NG_SITE_ORIGIN: 'https://rockandberg.github.io/mediavote-preview/ng-couvreur/site'
+          NG_BASE: '/mediavote-preview/ng-couvreur/site'
+        run: python3 ng-couvreur/build/build.py
+
+      - name: Contrôler le résultat
+        run: |
+          set -e
+          test -f ng-couvreur/site/index.html
+          n=$(ls ng-couvreur/site/assets/img/*.avif 2>/dev/null | wc -l)
+          echo "Variantes AVIF générées : $n"
+          test "$n" -gt 0
+          # Aucune référence au CDN d'origine ne doit subsister dans le HTML servi
+          if grep -rl "cloudfront.net" ng-couvreur/site --include='*.html' | grep -q .; then
+            echo "Des images pointent encore vers le CDN d'origine." >&2
+            exit 1
+          fi
+          du -sh ng-couvreur/site/assets/img
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
