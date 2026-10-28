@@ -395,6 +395,20 @@ a.zone:hover .zone__name{ color:var(--terre); }
 .field .hint{ font-size:.8125rem; color:var(--ink-60); }
 .field input[type="file"]{ padding:.75rem; background:var(--sable); cursor:pointer; }
 .field--err input,.field--err select,.field--err textarea{ border-color:var(--terre); }
+
+/* Case de consentement : une case à cocher n'est pas un champ de saisie,
+   elle ne doit hériter ni de la hauteur minimale ni du cadre. */
+/* Spécificité : .field label (0,1,1) l'emporterait sur .consent (0,1,0)
+   et imposerait ses capitales. On monte au même niveau. */
+.field label.consent{ display:flex; gap:.75rem; align-items:flex-start; cursor:pointer;
+  text-transform:none; letter-spacing:0; font-weight:400;
+  font-size:.9375rem; line-height:1.5; }
+.consent input[type="checkbox"]{
+  width:1.3rem; height:1.3rem; min-height:0; flex:none; margin:.12rem 0 0;
+  padding:0; border:1px solid var(--line-strong); border-radius:0;
+  accent-color:var(--t700); cursor:pointer; }
+.consent a{ color:var(--t700); text-underline-offset:2px; }
+.field--err .consent input[type="checkbox"]{ outline:2px solid var(--t600); outline-offset:2px; }
 .err{ font-size:.8125rem; font-weight:600; color:var(--terre); }
 @media (min-width:44rem){ .form__row{ display:grid; grid-template-columns:repeat(2,1fr); gap:1.4rem; } }
 .formnote{

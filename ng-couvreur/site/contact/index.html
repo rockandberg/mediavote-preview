@@ -25,6 +25,8 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&display=swap">
   <link rel="preload" as="image" type="image/avif" fetchpriority="high"
         imagesrcset="/mediavote-preview/ng-couvreur/site/assets/img/28-contact-cta-640.avif 640w, /mediavote-preview/ng-couvreur/site/assets/img/28-contact-cta-960.avif 960w, /mediavote-preview/ng-couvreur/site/assets/img/28-contact-cta-1280.avif 1280w, /mediavote-preview/ng-couvreur/site/assets/img/28-contact-cta-1920.avif 1920w, /mediavote-preview/ng-couvreur/site/assets/img/28-contact-cta-2560.avif 2560w" imagesizes="100vw">
+  <link rel="icon" href="/mediavote-preview/ng-couvreur/site/assets/icon/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/mediavote-preview/ng-couvreur/site/assets/icon/apple-touch-icon.png">
   <link rel="stylesheet" href="/mediavote-preview/ng-couvreur/site/assets/css/site.css">
   <script>/* Repli image : doit s'attacher avant tout chargement, donc en ligne. */
   document.addEventListener("error",function(e){var i=e.target;
@@ -76,12 +78,7 @@
       <h2 style="font-size:clamp(1.5rem,2.8vw,2.1rem)">Décrivez votre besoin.</h2>
       <p class="muted small" style="max-width:52ch;margin-bottom:.5rem">Plus votre description est précise, plus notre réponse le sera. Les photos aident beaucoup&nbsp;: une vue d'ensemble de la toiture et un gros plan du problème suffisent.</p>
 
-      <form class="form" data-devis action="https://formspree.io/f/REMPLACER" method="post" enctype="multipart/form-data" novalidate>
-        <div class="formnote formnote--alert" data-notice hidden tabindex="-1" role="alert">
-          <strong>Le formulaire n'est pas encore relié.</strong> Ce site est en préparation&nbsp;: l'envoi n'est pas actif.
-          Appelez-nous directement au <a href="tel:+33744817945" style="font-weight:700">07 44 81 79 45</a>.
-        </div>
-
+      <form class="form" data-devis action="https://formsubmit.co/Nathanegorreta@outlook.fr" method="post" enctype="multipart/form-data" novalidate>
         <div class="form__row">
           <div class="field">
             <label for="nom">Nom <span class="req" aria-hidden="true">*</span></label>
@@ -131,11 +128,24 @@
           <p class="hint">Facultatif. Une vue d'ensemble et un gros plan du problème.</p>
         </div>
 
-        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+        <input type="hidden" name="_subject" value="Demande de devis — site NG Couvreur">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="https://www.ngcouvreur.fr/contact/merci/">
+        <input type="hidden" name="_autoresponse" value="Bonjour, nous avons bien reçu votre demande et nous vous recontactons rapidement. Pour une urgence, appelez directement le 07 44 81 79 45. NG Couvreur, Propriano.">
+        <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+
+        <div class="field">
+          <label for="consent" class="consent">
+            <input type="checkbox" id="consent" name="consentement" value="oui" required>
+            <span>J'accepte que mes coordonnées soient utilisées pour répondre à ma demande. <a href="/mediavote-preview/ng-couvreur/site/politique-confidentialite/">Politique de confidentialité</a>. <span class="req" aria-hidden="true">*</span></span>
+          </label>
+          <p class="err" aria-live="polite"></p>
+        </div>
 
         <div>
           <button class="btn btn--primary btn--block" type="submit">Envoyer ma demande</button>
-          <p class="hint" style="margin-top:.85rem">En envoyant ce formulaire, vous acceptez que vos coordonnées soient utilisées pour vous répondre. Voir la <a href="/mediavote-preview/ng-couvreur/site/politique-confidentialite/">politique de confidentialité</a>.</p>
+          <p class="hint" style="margin-top:.85rem">Nous vous répondons par téléphone ou par e-mail. Pour une urgence, appelez plutôt le <a href="tel:+33744817945" style="font-weight:700">07 44 81 79 45</a>.</p>
         </div>
       </form>
     </div>

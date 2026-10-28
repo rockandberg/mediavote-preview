@@ -467,6 +467,8 @@ def head(title, meta, path, og_img="01", schema=""):
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&display=swap">%(pre)s%(heropre)s
+  <link rel="icon" href="%(icosvg)s" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="%(icopng)s">
   <link rel="stylesheet" href="%(css)s">
   <script>/* Repli image : doit s'attacher avant tout chargement, donc en ligne. */
   document.addEventListener("error",function(e){var i=e.target;
@@ -483,6 +485,7 @@ def head(title, meta, path, og_img="01", schema=""):
   "robots": robots, "title": e(title), "meta": e(meta),
   "canon": e(abs_url(path)), "ogimg": e(og_image_url(og_img)),
   "pre": preconnect, "heropre": hero_pre, "css": e(url("assets/css/site.css")),
+  "icosvg": e(url("assets/icon/favicon.svg")), "icopng": e(url("assets/icon/apple-touch-icon.png")),
   "schema": schema,
 }
 
@@ -1018,7 +1021,15 @@ def page_conseil(a):
 # ---------------------------------------------------------------------------
 # §13  CONTACT / DEVIS
 # ---------------------------------------------------------------------------
-FORM_ENDPOINT = "https://formspree.io/f/REMPLACER"   # ← à renseigner avant mise en ligne
+# Réception des demandes via FormSubmit : aucun compte à créer, la boîte de
+# réception suffit. La PREMIÈRE soumission déclenche un e-mail d'activation
+# qu'il faut valider une fois, sans quoi rien n'est transmis.
+#
+# L'adresse apparaît en clair dans le HTML, donc exposée aux robots
+# collecteurs. Après activation, FormSubmit fournit un alias aléatoire à
+# utiliser à la place : le remplacer ici supprime l'exposition.
+FORM_TO       = "Nathanegorreta@outlook.fr"
+FORM_ENDPOINT = "https://formsubmit.co/" + FORM_TO
 
 def page_contact():
     trail = [("Contact", None)]
@@ -1036,11 +1047,6 @@ def page_contact():
       <p class="muted small" style="max-width:52ch;margin-bottom:.5rem">Plus votre description est précise, plus notre réponse le sera. Les photos aident beaucoup&nbsp;: une vue d'ensemble de la toiture et un gros plan du problème suffisent.</p>
 
       <form class="form" data-devis action="%(endpoint)s" method="post" enctype="multipart/form-data" novalidate>
-        <div class="formnote formnote--alert" data-notice hidden tabindex="-1" role="alert">
-          <strong>Le formulaire n'est pas encore relié.</strong> Ce site est en préparation&nbsp;: l'envoi n'est pas actif.
-          Appelez-nous directement au <a href="%(tel)s" style="font-weight:700">%(teltxt)s</a>.
-        </div>
-
         <div class="form__row">
           <div class="field">
             <label for="nom">Nom <span class="req" aria-hidden="true">*</span></label>
@@ -1090,11 +1096,24 @@ def page_contact():
           <p class="hint">Facultatif. Une vue d'ensemble et un gros plan du problème.</p>
         </div>
 
-        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+        <input type="hidden" name="_subject" value="Demande de devis — site NG Couvreur">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="%(merci)s">
+        <input type="hidden" name="_autoresponse" value="Bonjour, nous avons bien reçu votre demande et nous vous recontactons rapidement. Pour une urgence, appelez directement le 07 44 81 79 45. NG Couvreur, Propriano.">
+        <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+
+        <div class="field">
+          <label for="consent" class="consent">
+            <input type="checkbox" id="consent" name="consentement" value="oui" required>
+            <span>J'accepte que mes coordonnées soient utilisées pour répondre à ma demande. <a href="%(pc)s">Politique de confidentialité</a>. <span class="req" aria-hidden="true">*</span></span>
+          </label>
+          <p class="err" aria-live="polite"></p>
+        </div>
 
         <div>
           <button class="btn btn--primary btn--block" type="submit">Envoyer ma demande</button>
-          <p class="hint" style="margin-top:.85rem">En envoyant ce formulaire, vous acceptez que vos coordonnées soient utilisées pour vous répondre. Voir la <a href="%(pc)s">politique de confidentialité</a>.</p>
+          <p class="hint" style="margin-top:.85rem">Nous vous répondons par téléphone ou par e-mail. Pour une urgence, appelez plutôt le <a href="%(tel)s" style="font-weight:700">%(teltxt)s</a>.</p>
         </div>
       </form>
     </div>
@@ -1124,6 +1143,7 @@ def page_contact():
 </div></section>""" % {
       "endpoint": e(FORM_ENDPOINT), "tel": TEL_HREF, "teltxt": TEL_TXT, "icon": PHONE_ICON,
       "options": options, "communes": communes, "pc": e(url("politique-confidentialite/")),
+      "merci": e(abs_url("contact/merci/")),
       "zones": e(", ".join(c["nom"] for c in COMMUNES)), "zonesurl": e(url("zones-intervention/")),
     }
     contact_schema = ('{"@context":"https://schema.org","@type":"ContactPage","url":"%s",'
@@ -1134,6 +1154,28 @@ def page_contact():
              "Contactez NG Couvreur, couvreur à Propriano. Demande de devis pour vos travaux de toiture en Corse-du-Sud. Téléphone %s." % TEL_TXT,
              "contact/", og_img="28", schema=jsonld(contact_schema, breadcrumb(trail)))
     write("contact", h + header("contact/") + body + footer())
+
+def page_merci():
+    """Arrivée après envoi du formulaire. Hors sitemap, non indexée."""
+    body = """<section class="section" style="padding-top:clamp(3rem,8vw,6rem)"><div class="shell">
+  <p class="label">Demande envoyée</p>
+  <h1 style="margin:1.25rem 0 1.5rem;font-size:clamp(2rem,5vw,3.4rem)">Merci, c'est bien parti.</h1>
+  <p class="lead">Nous avons reçu votre demande et nous vous recontactons rapidement, par téléphone ou par e-mail.</p>
+  <div class="formnote" style="margin-top:2rem;max-width:52ch">
+    <strong>Votre toiture prend l'eau&nbsp;?</strong> N'attendez pas notre rappel&nbsp;: appelez-nous, nous réagissons immédiatement.
+  </div>
+  <div class="actions" style="margin-top:2rem">
+    <a class="btn btn--primary btn__tel" href="%(tel)s">%(icon)s %(teltxt)s</a>
+    <a class="btn btn--outline" href="%(home)s">Retour à l'accueil</a>
+  </div>
+</div></section>""" % {"tel": TEL_HREF, "teltxt": TEL_TXT, "icon": PHONE_ICON, "home": e(url())}
+    h = head("Demande envoyée | NG Couvreur",
+             "Votre demande de devis a bien été transmise à NG Couvreur, couvreur à Propriano.",
+             "contact/merci/", og_img=None, schema="")
+    h = h.replace('<meta name="robots" content="index, follow">',
+                  '<meta name="robots" content="noindex, follow">')
+    write("contact/merci", h + header("contact/") + body + footer())
+
 
 # ---------------------------------------------------------------------------
 # §14  PAGES LÉGALES
@@ -1178,7 +1220,7 @@ def pages_legales():
       ("Données collectées",
        "<p>Ce site collecte uniquement les informations que vous transmettez volontairement via le formulaire "
        "de demande de devis&nbsp;: nom, téléphone, adresse e-mail, commune, type de travaux, description de "
-       "votre besoin et, le cas échéant, les photographies que vous joignez.</p>"
+       "votre besoin et, le cas échéant, les photographies que vous joignez. Le consentement que vous donnez en cochant la case du formulaire est également enregistré.</p>"
        "<p>Aucune inscription, aucun compte et aucun paiement en ligne ne sont proposés sur ce site.</p>"),
       ("Finalité",
        "<p>Ces données servent exclusivement à répondre à votre demande et, si elle aboutit, à préparer et à "
@@ -1188,9 +1230,13 @@ def pages_legales():
        "sont conservées le temps nécessaire au traitement de l'échange, puis supprimées. Les demandes ayant "
        "donné lieu à un devis ou à des travaux sont conservées pour la durée requise par les obligations "
        "comptables et de garantie applicables.</p>"),
-      ("Destinataires",
-       "<p>Les informations transmises sont destinées à NG Couvreur seul. Le formulaire est acheminé par un "
-       "prestataire technique d'envoi de formulaires&nbsp;: %s</p>" % TODO),
+      ("Destinataires et sous-traitant",
+       "<p>Les informations transmises sont destinées à NG Couvreur seul. Elles ne sont ni vendues, ni "
+       "cédées à des tiers à des fins commerciales.</p>"
+       "<p>L'acheminement technique du formulaire est assuré par <strong>FormSubmit</strong> "
+       "(formsubmit.co), qui transmet le contenu du formulaire vers la messagerie de l'entreprise. "
+       "Ce prestataire n'exploite pas les données pour son propre compte. Les messages sont ensuite "
+       "conservés dans la messagerie professionnelle de NG Couvreur.</p>"),
       ("Cookies et mesure d'audience",
        "<p>Ce site ne dépose aucun cookie publicitaire et n'utilise aucun traceur de mesure d'audience. Les "
        "polices de caractères sont chargées depuis Google Fonts, ce qui implique une connexion à ce service "
@@ -1242,7 +1288,7 @@ def main():
     # On repart d'un dossier propre, MAIS on préserve assets/img : les dérivés
     # web y sont déposés par optimize-images.py, qui tourne avant nous.
     if os.path.isdir(OUT):
-        keep = os.path.join(OUT, "assets", "img")
+        keep = {os.path.join(OUT, "assets", "img"), os.path.join(OUT, "assets", "icon")}
         for entry in os.listdir(OUT):
             path = os.path.join(OUT, entry)
             if entry != "assets":
@@ -1251,11 +1297,21 @@ def main():
         if os.path.isdir(assets):
             for entry in os.listdir(assets):
                 path = os.path.join(assets, entry)
-                if path != keep:
+                if path not in keep:
                     shutil.rmtree(path) if os.path.isdir(path) else os.remove(path)
     os.makedirs(os.path.join(OUT, "assets", "css"), exist_ok=True)
     os.makedirs(os.path.join(OUT, "assets", "js"), exist_ok=True)
     os.makedirs(os.path.join(OUT, "assets", "img"), exist_ok=True)
+    os.makedirs(os.path.join(OUT, "assets", "icon"), exist_ok=True)
+    # Marque géométrique : un pan de toiture. Deux initiales seraient
+    # illisibles à 16 px, une pente se lit encore à cette taille.
+    open(os.path.join(OUT, "assets", "icon", "favicon.svg"), "w", encoding="utf-8").write(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
+        '<rect width="32" height="32" fill="#8A3A1E"/>'
+        '<path d="M5 19.5 16 9l11 10.5" fill="none" stroke="#FDFCFA" '
+        'stroke-width="3.4" stroke-linecap="square"/>'
+        '<path d="M9.5 24.5h13" stroke="#E3A98C" stroke-width="2.6" stroke-linecap="square"/>'
+        '</svg>\n')
     shutil.copy(os.path.join(HERE, "site.css"), os.path.join(OUT, "assets", "css", "site.css"))
     shutil.copy(os.path.join(HERE, "site.js"),  os.path.join(OUT, "assets", "js",  "site.js"))
     open(os.path.join(OUT, ".nojekyll"), "w").close()
@@ -1279,6 +1335,7 @@ def main():
     for a in CONSEILS:
         page_conseil(a);        paths.append("conseils/%s/" % a["slug"])
     page_contact();             paths.append("contact/")
+    page_merci()   # hors sitemap : page d'arrivée, pas une page d'entrée
     pages_legales();            paths += ["mentions-legales/", "politique-confidentialite/"]
     page_404()
     sitemap(paths)

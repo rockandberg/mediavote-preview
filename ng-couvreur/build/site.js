@@ -76,7 +76,6 @@
   var form = document.querySelector('form[data-devis]');
   if (!form) return;
 
-  var notice = form.querySelector('[data-notice]');
 
   function fieldWrap(el) { return el.closest('.field'); }
 
@@ -99,6 +98,18 @@
   }
 
   function validate(el) {
+    /* Une case à cocher porte toujours une valeur : c'est son état coché
+       qu'il faut lire, pas son value. Le formulaire étant en novalidate,
+       le navigateur ne rattrape pas l'oubli. */
+    if (el.type === 'checkbox') {
+      if (el.hasAttribute('required') && !el.checked) {
+        setError(el, 'Merci de cocher cette case pour que nous puissions vous répondre.');
+        return false;
+      }
+      clearError(el);
+      return true;
+    }
+
     var v = (el.value || '').trim();
     if (el.hasAttribute('required') && !v) {
       setError(el, 'Ce champ est nécessaire pour vous répondre.');
@@ -122,6 +133,9 @@
     el.addEventListener('input', function () {
       if (fieldWrap(el) && fieldWrap(el).classList.contains('field--err')) validate(el);
     });
+    if (el.type === 'checkbox') {
+      el.addEventListener('change', function () { validate(el); });
+    }
   });
 
   form.addEventListener('submit', function (e) {
@@ -138,16 +152,5 @@
       return;
     }
 
-    /* Tant que l'endpoint n'est pas configuré, on ne simule pas un envoi :
-       on le dit et on renvoie vers le téléphone. */
-    var action = form.getAttribute('action') || '';
-    if (action.indexOf('REMPLACER') !== -1 || action === '') {
-      e.preventDefault();
-      if (notice) {
-        notice.hidden = false;
-        notice.focus();
-        notice.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
-      }
-    }
   });
 })();

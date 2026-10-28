@@ -80,9 +80,27 @@ def variants(row):
     return num, made, None, real, ratio
 
 
+def make_icons():
+    """Icône iOS : Safari exige un PNG, le SVG ne lui suffit pas."""
+    from PIL import ImageDraw
+    d = os.path.join(ROOT, "site", "assets", "icon")
+    os.makedirs(d, exist_ok=True)
+    s = 180
+    im = Image.new("RGB", (s, s), "#8A3A1E")
+    g = ImageDraw.Draw(im)
+    k = s / 32.0
+    g.line([(5 * k, 19.5 * k), (16 * k, 9 * k), (27 * k, 19.5 * k)],
+           fill="#FDFCFA", width=int(3.4 * k), joint="curve")
+    g.line([(9.5 * k, 24.5 * k), (22.5 * k, 24.5 * k)],
+           fill="#E3A98C", width=int(2.6 * k))
+    im.save(os.path.join(d, "apple-touch-icon.png"), "PNG", optimize=True)
+    print("Icône iOS générée (180x180).")
+
+
 def main():
     os.makedirs(CACHE, exist_ok=True)
     os.makedirs(OUTDIR, exist_ok=True)
+    make_icons()
     manifest = os.path.join(ROOT, "docs", "03-manifeste-images.csv")
     rows = [r for r in csv.DictReader(open(manifest, encoding="utf-8")) if r["num"] not in ("00A", "00B")]
 
