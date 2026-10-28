@@ -1,8 +1,0 @@
-# Originaux téléchargés pour la fabrication des dérivés — jamais versionnés
-.cache-originaux/
-
-# Images web générées par build/optimize-images.py : reconstruites à chaque
-# déploiement, elles n'ont pas à alourdir le dépôt.
-site/assets/img/*.jpg
-site/assets/img/*.webp
-site/assets/img/*.avif

@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: /
-
-# Site en préparation. PREVIEW = False dans build.py avant mise en ligne.
