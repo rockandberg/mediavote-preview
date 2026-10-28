@@ -1333,6 +1333,11 @@ def main():
         'stroke-width="3.4" stroke-linecap="square"/>'
         '<path d="M9.5 24.5h13" stroke="#E3A98C" stroke-width="2.6" stroke-linecap="square"/>'
         '</svg>\n')
+    # Domaine personnalisé : GitHub Pages lit ce fichier à la racine de
+    # l'artefact. Dérivé de SITE_ORIGIN, jamais saisi deux fois.
+    if not PREVIEW:
+        host = SITE_ORIGIN.split("//", 1)[-1].split("/", 1)[0]
+        open(os.path.join(OUT, "CNAME"), "w", encoding="utf-8").write(host + "\n")
     shutil.copy(os.path.join(HERE, "site.css"), os.path.join(OUT, "assets", "css", "site.css"))
     shutil.copy(os.path.join(HERE, "site.js"),  os.path.join(OUT, "assets", "js",  "site.js"))
     open(os.path.join(OUT, ".nojekyll"), "w").close()
