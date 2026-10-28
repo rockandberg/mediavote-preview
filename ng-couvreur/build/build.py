@@ -15,7 +15,7 @@ Basculer les images     : IMAGES_LOCAL = True une fois les fichiers dans
                           site/assets/img/ (§2).
 """
 
-import csv, html, os, re, shutil, datetime
+import base64, csv, html, os, re, shutil, datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)          # ng-couvreur/
@@ -1031,6 +1031,18 @@ def page_conseil(a):
 FORM_TO       = "Nathanegorreta@outlook.fr"
 FORM_ENDPOINT = "https://formsubmit.co/" + FORM_TO
 
+# L'adresse d'envoi n'est PAS écrite dans le HTML : elle est encodée ici et
+# remontée par JavaScript au chargement. Un robot qui n'exécute pas JS ne
+# trouve aucune cible, et l'adresse échappe aux moissonneurs d'adresses.
+# Ce n'est pas du chiffrement — un robot ciblé sait décoder — mais cela
+# écarte la quasi-totalité du spam automatisé.
+FORM_ENDPOINT_B64 = base64.b64encode(FORM_ENDPOINT.encode("utf-8")).decode("ascii")
+
+# Captcha FormSubmit : désactivé par défaut car il impose une page
+# intermédiaire qui fait chuter les demandes sur mobile. À passer à True si
+# du spam finit par passer — c'est la seule protection vérifiée côté serveur.
+FORM_CAPTCHA = False
+
 def page_contact():
     trail = [("Contact", None)]
     options = "".join('<option value="%s">%s</option>' % (re.sub("&amp;", "&", s["nav"]), s["h1"]) for s in SERVICES)
@@ -1046,7 +1058,15 @@ def page_contact():
       <h2 style="font-size:clamp(1.5rem,2.8vw,2.1rem)">Décrivez votre besoin.</h2>
       <p class="muted small" style="max-width:52ch;margin-bottom:.5rem">Plus votre description est précise, plus notre réponse le sera. Les photos aident beaucoup&nbsp;: une vue d'ensemble de la toiture et un gros plan du problème suffisent.</p>
 
-      <form class="form" data-devis action="%(endpoint)s" method="post" enctype="multipart/form-data" novalidate>
+      <noscript>
+        <div class="formnote formnote--alert">
+          <strong>Ce formulaire nécessite JavaScript</strong> — c'est ce qui nous protège des robots.
+          Appelez-nous directement au <a href="%(tel)s" style="font-weight:700">%(teltxt)s</a>, c'est de toute façon plus rapide.
+        </div>
+      </noscript>
+
+      <form class="form" data-devis data-ep="%(ep)s" method="post" enctype="multipart/form-data" novalidate>
+        <div class="formnote formnote--alert" data-formnote hidden tabindex="-1" role="alert"></div>
         <div class="form__row">
           <div class="field">
             <label for="nom">Nom <span class="req" aria-hidden="true">*</span></label>
@@ -1098,7 +1118,7 @@ def page_contact():
 
         <input type="hidden" name="_subject" value="Demande de devis — site NG Couvreur">
         <input type="hidden" name="_template" value="table">
-        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_captcha" value="%(captcha)s">
         <input type="hidden" name="_next" value="%(merci)s">
         <input type="hidden" name="_autoresponse" value="Bonjour, nous avons bien reçu votre demande et nous vous recontactons rapidement. Pour une urgence, appelez directement le 07 44 81 79 45. NG Couvreur, Propriano.">
         <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
@@ -1112,7 +1132,7 @@ def page_contact():
         </div>
 
         <div>
-          <button class="btn btn--primary btn--block" type="submit">Envoyer ma demande</button>
+          <button class="btn btn--primary btn--block" type="button" data-submit>Envoyer ma demande</button>
           <p class="hint" style="margin-top:.85rem">Nous vous répondons par téléphone ou par e-mail. Pour une urgence, appelez plutôt le <a href="%(tel)s" style="font-weight:700">%(teltxt)s</a>.</p>
         </div>
       </form>
@@ -1141,7 +1161,8 @@ def page_contact():
 
   </div>
 </div></section>""" % {
-      "endpoint": e(FORM_ENDPOINT), "tel": TEL_HREF, "teltxt": TEL_TXT, "icon": PHONE_ICON,
+      "ep": e(FORM_ENDPOINT_B64), "captcha": "true" if FORM_CAPTCHA else "false",
+      "tel": TEL_HREF, "teltxt": TEL_TXT, "icon": PHONE_ICON,
       "options": options, "communes": communes, "pc": e(url("politique-confidentialite/")),
       "merci": e(abs_url("contact/merci/")),
       "zones": e(", ".join(c["nom"] for c in COMMUNES)), "zonesurl": e(url("zones-intervention/")),

@@ -78,7 +78,15 @@
       <h2 style="font-size:clamp(1.5rem,2.8vw,2.1rem)">Décrivez votre besoin.</h2>
       <p class="muted small" style="max-width:52ch;margin-bottom:.5rem">Plus votre description est précise, plus notre réponse le sera. Les photos aident beaucoup&nbsp;: une vue d'ensemble de la toiture et un gros plan du problème suffisent.</p>
 
-      <form class="form" data-devis action="https://formsubmit.co/Nathanegorreta@outlook.fr" method="post" enctype="multipart/form-data" novalidate>
+      <noscript>
+        <div class="formnote formnote--alert">
+          <strong>Ce formulaire nécessite JavaScript</strong> — c'est ce qui nous protège des robots.
+          Appelez-nous directement au <a href="tel:+33744817945" style="font-weight:700">07 44 81 79 45</a>, c'est de toute façon plus rapide.
+        </div>
+      </noscript>
+
+      <form class="form" data-devis data-ep="aHR0cHM6Ly9mb3Jtc3VibWl0LmNvL05hdGhhbmVnb3JyZXRhQG91dGxvb2suZnI=" method="post" enctype="multipart/form-data" novalidate>
+        <div class="formnote formnote--alert" data-formnote hidden tabindex="-1" role="alert"></div>
         <div class="form__row">
           <div class="field">
             <label for="nom">Nom <span class="req" aria-hidden="true">*</span></label>
@@ -144,7 +152,7 @@
         </div>
 
         <div>
-          <button class="btn btn--primary btn--block" type="submit">Envoyer ma demande</button>
+          <button class="btn btn--primary btn--block" type="button" data-submit>Envoyer ma demande</button>
           <p class="hint" style="margin-top:.85rem">Nous vous répondons par téléphone ou par e-mail. Pour une urgence, appelez plutôt le <a href="tel:+33744817945" style="font-weight:700">07 44 81 79 45</a>.</p>
         </div>
       </form>

@@ -50,13 +50,20 @@ publication.
 | Ajouter un conseil | la table `CONSEILS` (§4) |
 | Changer un texte alternatif | la table `ALT` (§2) |
 | Recadrer un visuel | la table `FOCUS` — `object-position` par image |
-| Brancher le formulaire | `FORM_ENDPOINT` (§13) — remplacer `REMPLACER` |
+| Changer la boîte de réception | `FORM_TO` (§13) |
+| Activer le captcha FormSubmit | `FORM_CAPTCHA = True` (§13) — si du spam passe |
 
 ## Reste à faire avant la mise en ligne définitive
 
-1. **Formulaire de devis** — `FORM_ENDPOINT` pointe sur un jeton `REMPLACER`.
-   Tant qu'il n'est pas renseigné, l'envoi est bloqué et le visiteur est
-   renvoyé vers le téléphone. Aucun envoi n'est simulé.
+1. **Formulaire de devis** — relié à FormSubmit. La première soumission
+   déclenche un e-mail d'activation à valider une fois, sans quoi rien n'est
+   transmis. Remplacer ensuite `FORM_TO` par l'alias fourni par FormSubmit.
+
+   Protections anti-robots : l'adresse d'envoi est absente du HTML et
+   reconstituée en JavaScript ; le bouton n'est armé qu'à ce moment ; un
+   délai minimum de 3 s est imposé ; un pot de miel (`_honey`) est vérifié
+   par FormSubmit. Si du spam finit par passer, `FORM_CAPTCHA = True`
+   active le captcha FormSubmit, seule protection vérifiée côté serveur.
 2. **Mentions légales** — SIRET, forme juridique, adresse du siège, hébergeur,
    assurance décennale et médiateur sont marqués « à compléter ».
 3. **Domaine** — renseigner `SITE_ORIGIN` et passer `PREVIEW` à `False`.

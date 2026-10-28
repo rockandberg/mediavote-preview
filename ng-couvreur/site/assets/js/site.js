@@ -76,6 +76,39 @@
   var form = document.querySelector('form[data-devis]');
   if (!form) return;
 
+  var note = form.querySelector('[data-formnote]');
+
+  /* --- Anti-robots ------------------------------------------------------ */
+  /* L'adresse d'envoi n'est pas dans le HTML : on la reconstitue ici. Un
+     robot qui n'exécute pas JavaScript ne trouve donc aucune cible. */
+  var armed = false;
+  try {
+    var ep = form.getAttribute('data-ep');
+    if (ep) {
+      form.setAttribute('action', atob(ep));
+      form.removeAttribute('data-ep');
+      /* Le bouton n'est un bouton d'envoi qu'une fois l'adresse en place :
+         sans JavaScript, il ne déclenche rien plutôt que d'envoyer le
+         formulaire sur une page statique, qui répondrait par une erreur. */
+      var btn = form.querySelector('[data-submit]');
+      if (btn) { btn.setAttribute('type', 'submit'); }
+      armed = true;
+    }
+  } catch (err) {
+    armed = false;
+  }
+
+  /* Un humain ne remplit pas six champs en deux secondes. Un robot, si. */
+  var openedAt = Date.now();
+  var DELAI_MINIMUM = 3000;
+
+  function refuser(message) {
+    if (!note) return;
+    note.innerHTML = message;
+    note.hidden = false;
+    note.focus();
+  }
+
 
   function fieldWrap(el) { return el.closest('.field'); }
 
@@ -152,5 +185,21 @@
       return;
     }
 
+    if (!armed || !form.getAttribute('action')) {
+      e.preventDefault();
+      refuser('<strong>L\'envoi est indisponible depuis ce navigateur.</strong> ' +
+              'Appelez-nous au <a href="tel:+33744817945" style="font-weight:700">07 44 81 79 45</a>.');
+      return;
+    }
+
+    if (Date.now() - openedAt < DELAI_MINIMUM) {
+      e.preventDefault();
+      refuser('<strong>Un instant.</strong> Relisez votre demande, puis renvoyez-la — ' +
+              'cette courte pause nous protège des envois automatisés.');
+      window.setTimeout(function () { if (note) { note.hidden = true; } }, 4000);
+      return;
+    }
+
+    if (note) { note.hidden = true; }
   });
 })();
